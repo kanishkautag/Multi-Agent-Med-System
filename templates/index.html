@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Analysis System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 80px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+        }
+
+        .result-container {
+            margin-top: 20px;
+            display: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .treatment-summary {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .treatment-content {
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+
+        .error {
+            color: #dc3545;
+            padding: 10px;
+            background-color: #fff3f3;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            color: #333;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Medical Analysis System</h1>
+        <form id="diagnosisForm">
+            <div class="form-group">
+                <label for="symptoms">Symptoms:</label>
+                <textarea id="symptoms" name="symptoms" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="testResults">Test Results:</label>
+                <textarea id="testResults" name="testResults" required></textarea>
+            </div>
+            <button type="submit" id="analyzeButton">Analyze</button>
+        </form>
+        <div id="result" class="result-container">
+            <h2>Analysis Result</h2>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('diagnosisForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const symptoms = document.getElementById('symptoms').value;
+            const testResults = document.getElementById('testResults').value;
+            
+            const analyzeButton = document.getElementById('analyzeButton');
+            const resultContainer = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+            
+            analyzeButton.disabled = true;
+            resultContainer.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        symptoms,
+                        test_results: testResults,
+                    }),
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Analysis failed');
+                }
+                
+                const data = await response.json();
+                resultContent.innerHTML = `<pre>${data.result}</pre>`;
+                resultContainer.style.display = 'block';
+            } catch (error) {
+                resultContent.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                resultContainer.style.display = 'block';
+            } finally {
+                analyzeButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
