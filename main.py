@@ -3,14 +3,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-import uvicorn
 from crew import medical_crew
 
 app = FastAPI()
 
+# Serve static files (e.g., for your CSS, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Set up Jinja2 templates
 templates = Jinja2Templates(directory="templates")
 
+# Middleware for handling CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,14 +22,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Model for patient data
 class PatientData(BaseModel):
     symptoms: str
     test_results: str
 
+# Main route rendering the HTML page
 @app.get("/")
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+# API endpoint for analyzing patient data
 @app.post("/api/analyze")
 async def analyze_patient(patient_data: PatientData):
     try:
@@ -51,5 +57,4 @@ async def analyze_patient(patient_data: PatientData):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+# Entry point for Vercel, no need for uvicorn.run here
