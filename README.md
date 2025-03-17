@@ -22,6 +22,9 @@ An intelligent medical diagnosis system that leverages AI agents powered by Goog
   - CrewAI framework for agent collaboration
   - Efficient task delegation and processing
 
+    ![image](https://github.com/user-attachments/assets/1557a841-b118-4de8-82eb-923d7c541b3c)
+
+
 ## 🔧 Technical Stack
 
 - **Backend**
